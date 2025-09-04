@@ -13,7 +13,7 @@ t_token	*new_token(t_token_type type, char	*value)
 	return (new);
 }
 
-char	*auxiliar_join(char **word, t_mini_sh *sh)
+void	expand_last_status(char **word, int *i, t_mini_sh *sh)
 {
 	char	*tmp;
 	char	*status_char;
@@ -21,7 +21,9 @@ char	*auxiliar_join(char **word, t_mini_sh *sh)
 	status_char = ft_itoa(sh->last_status);
 	tmp = ft_strjoin(*word, status_char);
 	free(status_char);
-	return (tmp);
+	free(*word);
+	*word = tmp;
+	(*i)++;
 }
 
 void	handle_env(char *line, int *i, char **word, t_mini_sh *sh)
@@ -33,13 +35,7 @@ void	handle_env(char *line, int *i, char **word, t_mini_sh *sh)
 
 	start = ++(*i);
 	if (line[*i] == '?')
-	{
-		tmp = auxiliar_join(word, sh);
-		free(*word);
-		*word = tmp;
-		(*i)++;
-		return ;
-	}
+		return (expand_last_status(word, i, sh));
 	while (ft_isalnum(line[*i]) || line[*i] == '_')
 		(*i)++;
 	if (start == *i)
@@ -74,20 +70,18 @@ void	handle_quotes(char *line, int *i, char **word, t_mini_sh *sh)
 			handle_env(line, i, &seg, sh);
 		else
 		{
-			c[0] = line[*i];
+			c[0] = line[(*i)++];
 			c[1] = '\0';
 			tmp = seg;
 			seg = ft_strjoin(seg, c);
 			free(tmp);
-			(*i)++;
 		}
 	}
 	if (line[*i] == quote_char)
 		(*i)++;
 	tmp = *word;
 	*word = ft_strjoin(*word, seg);
-	free(tmp);
-	free(seg);
+	return (free(tmp), free(seg));
 }
 
 void	handle_pipe(int *i, t_token **last)
@@ -128,12 +122,11 @@ void	handle_redirection(char *line, int *i, t_token **head, t_token **last)
 	(*i)++;
 }
 
-void	handle_word(char *line, int *i, t_token **head, t_token **last, t_mini_sh *sh)
+char	*ft_build_word(char *line, int *i, t_mini_sh *sh)
 {
 	char	*word;
 	char	*tmp;
 	char	c[2];
-	t_token	*tok;
 
 	word = ft_strdup("");
 	while (line[*i] && line[*i] != '|')
@@ -154,6 +147,15 @@ void	handle_word(char *line, int *i, t_token **head, t_token **last, t_mini_sh *
 			(*i)++;
 		}
 	}
+	return (word);
+}
+
+void	handle_word(char *line, int *i, t_token **head, t_token **last, t_mini_sh *sh)
+{
+	char	*word;
+	t_token	*tok;
+
+	word = ft_build_word(line, i, sh);
 	if (!word || !*word)
 		return (free(word));
 	tok = new_token(TOKEN_WORD, word);
@@ -192,16 +194,32 @@ int	check_quotes(char *line)
 	return (in_single || in_double);
 }
 
-t_token	*tokenizer(char *line, t_mini_sh *sh)
+void	ft_build_tokens(char *line, t_token **head, t_mini_sh *sh)
 {
-	int	i;
-	int	checker;
-	t_token	*head;
+	int		i;
 	t_token	*last;
 
 	i = 0;
-	head = NULL;
 	last = NULL;
+        while (line[i])
+	{
+		if (line[i] == '|')
+			handle_pipe(&i, &last);
+		else if (line[i] == '>' || line[i] == '<')
+			handle_redirection(line, &i, head, &last);
+		else if (line[i] == ' ')
+			i++;
+		else
+			handle_word(line, &i, head, &last, sh);
+	}
+}
+
+t_token	*tokenizer(char *line, t_mini_sh *sh)
+{
+	int		checker;
+	t_token	*head;
+
+	head = NULL;
 	if (line[0] == '|')
 	{
 		printf("minishell: syntax error near unexpected token '|'\n");
@@ -209,21 +227,7 @@ t_token	*tokenizer(char *line, t_mini_sh *sh)
 	}
 	checker = check_quotes(line);
 	if (checker == 0)
-	{
-		while (line[i])
-		{
-			//if (line[i] == '"' || line[i] == '\'')
-			//	handle_quotes(line, &i, &head, &last, sh);
-			if (line[i] == '|')
-				handle_pipe(&i, &last);
-			else if (line[i] == '>' || line[i] == '<')
-				handle_redirection(line, &i, &head, &last);
-			else if (line[i] == ' ')
-				i++;
-			else
-				handle_word(line, &i, &head, &last, sh);
-		}
-	}
+		ft_build_tokens(line, &head, sh);
 	else if (checker == 1)
 		printf("Unclosed quotes\n");
 	return (head);

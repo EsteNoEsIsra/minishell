@@ -1,83 +1,61 @@
 #include "includes/minishell.h"
 
-int ft_strlen_array(char **s) // cuenta las palabras split 
-{	
-	int i;
-
-	i = 0;
-	if (!s)
-		return (0);
-	while (s[i])
-		i++;
-	return (i);
-	
-}
-// access ( path , modo  X_OK  significa que  access esta preaguntando al USER si se puede ejecutar )    Si se puede devuelve 0  y si falla devuelve -1
-int ft_check_access(char *path)
+int	preflight_path(char *path)
 {
+	struct stat st;
 
-	if (access(path, X_OK) == 0)
-		return (1);
-	else 
-		return (-1);
+	if (stat(path, &st) == -1)
+	{
+		ft_put_error(path, strerror(errno));
+		if (errno == ENOENT || errno == ENOTDIR)
+			return (127);
+		else
+			return (126);
+	}
+	if (S_ISDIR(st.st_mode))
+		return (ft_put_error(path, "Is a directory"), 126);
+	if (access(path, X_OK == -1))
+		return (ft_put_error(path, strerror(errno)), 126);
+	return (0);
 }
 
-char *ft_get_path(t_ast*command, t_mini_sh *sh) // intento de refactor
+char	*join_dir_cmd(char *dir, char *cmd)
+{
+	char	*tmp;
+	char	*res;
+
+	tmp = ft_strjoin(dir, "/");
+	if (!tmp)
+		return (NULL);
+	res = ft_strjoin(tmp, cmd);
+	free(tmp);
+	return (res);
+}
+
+char	*ft_get_path(t_ast *command, t_mini_sh *sh) // intento de refactor
 {
 	t_env 	*path;
-	char 	**path_splited;
-	int	len;
-	int	count;
-	char 	*to_exec;
-	char	*result;
-	char	*tmp;
+	char 	**dirs;
+	char	*cand;
+	int	i;
 
 	path = ft_getenv(sh->env, "PATH");
 	if (!path)
 		return (NULL);
-	path_splited = ft_split(path->value,':');
-	count = 0;
-	len = ft_strlen_array(path_splited);
-
-	to_exec = ft_strjoin("/", command->args[0]);	
-						   
-/*	{	 Para ver las string  despues del split con : de delimitador
-		int i = 0;
-		while (i < len)
-		{	printf("*%s*\n\n",path_splited[i]);  i++; }// a eliminar
-	 
-						
-	}                  */ 
-	
-	
-	while (count < len)
+	dirs = ft_split(path->value,':');
+	if (!dirs)
+		return (NULL);
+	i = 0;
+	while (dirs[i])
 	{
-		tmp = path_splited[count];
-		path_splited[count] = ft_strjoin(path_splited[count], to_exec);
-		free(tmp);
-		if (ft_check_access(path_splited[count]) == 1)
-		{
-			
-			result = ft_strdup(path_splited[count]);
-			ft_free_strs(path_splited);
-			free(to_exec);
-			return (result);
-		}
-/*		else  
-		{
-			free(path_splited[count]);
-//			free(**path_splited);
-			free(path_splited);
-			free(to_exec);
-
-		}              */
-		count++;					
+		cand = join_dir_cmd(dirs[i], command->args[0]);
+		if (cand && access(cand, X_OK) == 0)
+			return (ft_free_strs(dirs), cand);
+		free(cand);
+		i++;
 	}
-	free(to_exec);
-	ft_free_strs(path_splited);
+	ft_free_strs(dirs);
 	return (NULL);
-//	free(to_exec);
-//	return (path_splited[count]); // solo para que devuelva algo  
 }
 
 void	ft_put_error(char *prefix, char *msg)
@@ -88,11 +66,81 @@ void	ft_put_error(char *prefix, char *msg)
 	write(2, "\n", 1);
 }
 
+t_ast	*child_prepare(t_ast *node, t_mini_sh *sh)
+{
+	node = apply_redirs_and_get_cmd(node);
+	if (!node)
+	{
+		ft_free_mini_sh(sh, 1);
+		exit(EXIT_FAILURE);
+	}
+	if (ft_execute_builting(node, sh))
+	{
+		ft_free_mini_sh(sh, 1);
+		exit(0);
+	}
+	return (node);
+}
+
+char	*resolve_path(t_ast *node, t_mini_sh *sh)
+{
+	char	*path;
+	int	ec;
+
+	if (ft_strchr(node->args[0], '/'))
+	{
+		path = ft_strdup(node->args[0]);
+		if (!path)
+			return (NULL);
+		ec = preflight_path(path);
+		if (ec)
+		{
+			free(path);
+			ft_free_mini_sh(sh, 1);
+			exit(ec);
+		}
+		return (path);
+	}
+	path = ft_get_path(node, sh);
+	if (!path)
+	{
+		ft_put_error(node->args[0], "command not found");
+		ft_free_mini_sh(sh, 1);
+		exit(127);
+	}
+	return (path);
+}
+
+void	ft_do_exec(char *path, t_ast *node, t_mini_sh *sh)
+{
+	char	**env;
+	int	ec;
+
+	env = ft_env_to_arr(sh->env);
+	if (!env)
+	{
+		free(path);
+		ft_free_mini_sh(sh, 1);
+		exit(1);
+	}
+	if (execve(path, node->args, env) == -1)
+	{
+		if (errno == ENOENT || errno == ENOTDIR)
+			ec = 127;
+		else
+			ec = 126;
+		ft_put_error(path, strerror(errno));
+		free(path);
+		ft_free_strs(env);
+		ft_free_mini_sh(sh, 1);
+		exit(ec);
+	}
+}
+
 void	ft_execute(t_ast *node, t_mini_sh *sh)
 {
 	int	status;
 	char 	*path;
-	char	**env_arr;
 
 	if (node->type == NODE_COMMAND && !node->args[0][0])
 		return ;
@@ -100,53 +148,14 @@ void	ft_execute(t_ast *node, t_mini_sh *sh)
 		return ;
 	sh->mypid = fork();
 	if (sh->mypid == -1)
-	{
-		ft_free_mini_sh(sh, 1);
-		exit(EXIT_FAILURE);
-	}
-	else if (sh->mypid == 0)
+		return (ft_free_mini_sh(sh, 1));
+	if (sh->mypid == 0)
 	{
 		//ft_setup_own();// poner las señales por defecto en el hijo
 		set_signals_interactive();//test---------------------------------------------------------------
-		node = apply_redirs_and_get_cmd(node);
-		if (!node)
-		{
-			ft_free_mini_sh(sh, 1);
-			exit(EXIT_FAILURE);
-		}
-		if (ft_execute_builting(node, sh))
-		{
-			ft_free_mini_sh(sh, 1);
-			exit(EXIT_SUCCESS);
-		}
-		if(ft_strchr(node->args[0], '/') != NULL)
-			path = ft_strdup(node->args[0]);
-		else
-			path = ft_get_path(node, sh);
-		if (!path)
-		{
-			ft_put_error(node->args[0], "command not found");
-			ft_free_mini_sh(sh, 1);
-			exit(127); //comando no encontrado
-		}
-		env_arr = ft_env_to_arr(sh->env);
-		if (execve(path, node->args, env_arr) == -1)
-		{
-			struct stat st;
-			stat(path, &st);
-			if (S_ISDIR(st.st_mode))
-			{
-				ft_put_error(path, "Is a directory");
-				exit (126);
-			}
-			ft_put_error(path, strerror(errno));
-			free(path);
-			ft_free_strs(env_arr);
-			if (errno == ENOENT || errno == ENOTDIR)
-				exit(127);
-			exit(126); //comando no ejecutable
-		}
-		ft_free_strs(env_arr);
+		node = child_prepare(node, sh);
+		path = resolve_path(node, sh);
+		ft_do_exec(path, node, sh);
 	}
 	waitpid(sh->mypid, &status, 0);
 	handle_status(status, sh, 0);

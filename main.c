@@ -12,38 +12,10 @@
 
 #include "includes/minishell.h"
 
-
-
-/*char	*ft_get_prompt()
-{
-	char	cwd[PATH_MAX];
-	char	*tmp1;
-	char	*tmp2;
-	char	*prompt;
-
-	if (getcwd(cwd, sizeof(cwd)))
-	{
-		tmp1 = ft_strjoin(GRN, cwd);
-		tmp2 = ft_strjoin(tmp1, " Minishell$>☠ ");
-		free(tmp1);
-		prompt = ft_strjoin(tmp2, NRM);
-		free(tmp2);
-		return (prompt);
-	}
-	tmp1 = ft_strjoin(GRN, "Minishell$>☠ ");
-	prompt = ft_strjoin(tmp1, NRM);
-	free(tmp1);
-	return (prompt);
-}*/
-
 void ft_getinput(t_mini_sh*sh)
 {
-	//char	*prompt;
-	//char 	**args;
-
 	while (1)
 	{
-		//prompt = ft_get_prompt();
 		set_signals_interactive();
 		sh->input = readline(GRN "Minishell$> " NRM);
 	//	set_signals_noninteractive();
@@ -73,7 +45,6 @@ void ft_getinput(t_mini_sh*sh)
 		sh->tokens = tokenizer(sh->input, sh);
 		if (!sh->tokens)
 		{
-			//free(prompt);
 			free(sh->input);
 			continue ;
 		}
@@ -89,7 +60,6 @@ void ft_getinput(t_mini_sh*sh)
 		if (!sh->node)
 		{
 			ft_free_mini_sh(sh, 0);
-			//free(prompt);
 			continue ;
 		}
 		sh->node_head = sh->node;
@@ -104,7 +74,6 @@ void ft_getinput(t_mini_sh*sh)
 		//printf("*-*" BLU "%s" NRM "*-*\n",node->args[0]);
 		//if(node->args[0][0] == '/')   para otras opciones
 		ft_free_mini_sh(sh, 0);
-		//free(prompt);
 	}
 
 }
