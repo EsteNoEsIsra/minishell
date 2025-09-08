@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_environment.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/08 18:22:36 by nalesso           #+#    #+#             */
+/*   Updated: 2025/09/08 18:33:03 by nalesso          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "includes/minishell.h"
 
 t_env	*ft_new_env(char *name, char *value)
@@ -22,9 +34,7 @@ t_env	*ft_new_env(char *name, char *value)
 
 t_env	*ft_setenv(char **env)
 {
-	int	i;
-	char	*key;
-	char	*value;
+	int		i;
 	char	*eq;
 	t_env	*head;
 	t_env	*last;
@@ -36,9 +46,7 @@ t_env	*ft_setenv(char **env)
 	while (env[i])
 	{
 		eq = ft_strchr(env[i], '=');
-		key = ft_substr(env[i], 0, eq - env[i]);
-		value = ft_strdup(eq + 1);
-		new = ft_new_env(key, value);
+		new = ft_new_env(ft_substr(env[i], 0, eq - env[i]), ft_strdup(eq + 1));
 		if (!head)
 			head = new;
 		else
@@ -63,12 +71,12 @@ t_env	*ft_getenv(t_env *head, char *name)
 	return (node);
 }
 
-int	ft_envlen(t_env *head)
+static int	ft_envlen(t_env *head)
 {
 	int	i;
 
 	i = 0;
-	while(head)
+	while (head)
 	{
 		i++;
 		head = head->next;
@@ -80,8 +88,8 @@ char	**ft_env_to_arr(t_env *head)
 {
 	char	**result;
 	char	*tmp1;
-	int	env_len;
-	int	i;
+	int		env_len;
+	int		i;
 
 	env_len = ft_envlen(head);
 	result = malloc(sizeof(char *) * (env_len + 1));

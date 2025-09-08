@@ -6,7 +6,7 @@
 /*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 13:46:16 by nalesso           #+#    #+#             */
-/*   Updated: 2025/07/22 16:18:01 by nalesso          ###   ########.fr       */
+/*   Updated: 2025/09/08 18:52:02 by nalesso          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,9 @@
 
 void	ft_free_strs(char **strs)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	if (!strs)
 		return ;
 	while (strs[i])
@@ -26,12 +27,12 @@ void	ft_free_strs(char **strs)
 	free(strs);
 }
 
-void	ft_freeAST(t_ast *head)
+void	ft_free_ast(t_ast *head)
 {
 	if (!head)
 		return ;
-	ft_freeAST(head->left);
-	ft_freeAST(head->right);
+	ft_free_ast(head->left);
+	ft_free_ast(head->right);
 	if (head->args)
 		ft_free_strs(head->args);
 	if (head->filename)
@@ -79,7 +80,7 @@ void	ft_free_mini_sh(t_mini_sh *sh, int env)
 	}
 	if (sh->node_head)
 	{
-		ft_freeAST(sh->node_head);
+		ft_free_ast(sh->node_head);
 		sh->node = NULL;
 		sh->node_head = NULL;
 	}

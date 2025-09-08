@@ -6,7 +6,7 @@
 /*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 12:34:16 by nalesso           #+#    #+#             */
-/*   Updated: 2025/09/02 16:22:50 by nalesso          ###   ########.fr       */
+/*   Updated: 2025/09/08 20:03:34 by nalesso          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,7 @@ static pid_t	child_right(t_ast *node, t_mini_sh *sh, int fd[2])
 void	ft_execute_pipe(t_ast *node, t_mini_sh *sh)
 {
 	int		fd[2];
-	int		st1;
-	int		st2;
+	int		status;
 	int		printed;
 	pid_t	pid1;
 	pid_t	pid2;
@@ -95,13 +94,13 @@ void	ft_execute_pipe(t_ast *node, t_mini_sh *sh)
 	pid2 = child_right(node, sh, fd);
 	close(fd[0]);
 	close(fd[1]);
-	waitpid(pid1, &st1, 0);
-	waitpid(pid2, &st2, 0);
+	waitpid(pid1, &status, 0);
 	printed = 0;
-	if (WIFSIGNALED(st1) && WTERMSIG(st1) == SIGPIPE)
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGPIPE)
 	{
 		ft_put_error("Minishell: ", "Broken pipe");
 		printed = 1;
 	}
-	handle_status(st2, sh, printed);
+	waitpid(pid2, &status, 0);
+	handle_status(status, sh, printed);
 }

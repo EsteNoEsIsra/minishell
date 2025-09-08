@@ -6,7 +6,7 @@
 /*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 11:50:51 by nalesso           #+#    #+#             */
-/*   Updated: 2025/08/26 11:51:18 by nalesso          ###   ########.fr       */
+/*   Updated: 2025/09/08 18:49:20 by nalesso          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	ft_strslen(char **strs)
 	int	i;
 
 	i = 0;
-	while(strs[i])
+	while (strs[i])
 		i++;
 	return (i);
 }

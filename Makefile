@@ -1,9 +1,10 @@
 NAME = minishell
 
-SRC = main.c tokenizer.c parsing.c print_ast.c redirections.c ft_executions.c ft_frees.c \
+SRC = main.c tokenizer/tokenizer.c general_utils.c parsing.c redirections.c ft_frees.c \
 pipe/pipe.c builtings/ft_echo.c builtings/ft_cd.c builtings/ft_execute_builting.c \
 builtings/ft_pwd.c ft_environment.c builtings/ft_export.c builtings/ft_env.c \
-builtings/ft_unset.c builtings/ft_bexit.c signals/signals.c
+builtings/ft_unset.c builtings/ft_bexit.c signals/signals.c executions/ft_executions.c \
+executions/ft_executions_utils.c ft_getinput.c tokenizer/tokenizer_utils.c
 HDR = includes/minishell.h
 
 CC = cc

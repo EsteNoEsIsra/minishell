@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parsing.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/08 20:07:42 by nalesso           #+#    #+#             */
+/*   Updated: 2025/09/08 20:19:01 by nalesso          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "includes/minishell.h"
 
-t_ast	*new_ASTNode(t_node_type type, char **args, char *filename, t_token_type redir_type)
+t_ast	*new_node(t_node_type type, char **args, char *str, t_token_type r_type)
 {
 	t_ast	*new;
 
@@ -9,32 +21,18 @@ t_ast	*new_ASTNode(t_node_type type, char **args, char *filename, t_token_type r
 		return (NULL);
 	new->type = type;
 	new->args = args;
-	new->filename = filename;
-	new->redir_type = redir_type;
+	new->filename = str;
+	new->redir_type = r_type;
 	new->heredoc_fd = -1;
 	new->right = NULL;
 	new->left = NULL;
 	return (new);
 }
 
-int	validate_command(t_ast *node)
-{
-	t_ast	*bottom = node;
-	while (bottom && bottom->type == NODE_REDIR)
-		bottom = bottom->left;
-	if (!bottom || !bottom->args || !bottom->args[0])
-	{
-		ft_put_error("minishell", "syntax error: empty command");
-		ft_freeAST(node);
-		return (0);
-	}
-	return (1);
-}
-
 t_ast	*parse_redir(t_token **tokens, t_ast *left)
 {
-	t_ast	*redir;
-	char 	*filename;
+	t_ast			*redir;
+	char			*filename;
 	t_token_type	redir_type;
 
 	redir_type = (*tokens)->type;
@@ -42,33 +40,16 @@ t_ast	*parse_redir(t_token **tokens, t_ast *left)
 	if (!*tokens || (*tokens)->type != TOKEN_WORD)
 	{
 		printf("minishell: syntax error near redirection\n");
-		ft_freeAST(left);
+		ft_free_ast(left);
 		return (NULL);
 	}
 	filename = ft_strdup((*tokens)->value);
 	*tokens = (*tokens)->next;
-	redir = new_ASTNode(NODE_REDIR, NULL, filename, redir_type);
+	redir = new_node(NODE_REDIR, NULL, filename, redir_type);
 	if (!redir)
-		return (ft_freeAST(left), NULL);
+		return (ft_free_ast(left), NULL);
 	redir->left = left;
 	return (redir);
-}
-
-
-int	is_redir(t_token_type type)
-{
-	int	result;
-
-	result = 0;
-	if (type == TOKEN_REDIR_OUT)
-		result = 1;
-	else if (type == TOKEN_HEREDOC)
-		result = 1;
-	else if (type == TOKEN_REDIR_IN)
-		result = 1;
-	else if (type == TOKEN_REDIR_APPEND)
-		result = 1;
-	return (result);
 }
 
 int	cmd_args_append(t_ast *cmd, char *value)
@@ -103,7 +84,7 @@ t_ast	*parse_command(t_token **tokens)
 	t_ast	*cmd;
 	t_ast	*left;
 
-	cmd = new_ASTNode(NODE_COMMAND, NULL, NULL, TOKEN_NONE);
+	cmd = new_node(NODE_COMMAND, NULL, NULL, TOKEN_NONE);
 	if (!cmd)
 		return (NULL);
 	left = cmd;
@@ -112,7 +93,7 @@ t_ast	*parse_command(t_token **tokens)
 		if ((*tokens)->type == TOKEN_WORD)
 		{
 			if (!cmd_args_append(cmd, (*tokens)->value))
-				return (ft_freeAST(left), NULL);
+				return (ft_free_ast(left), NULL);
 			*tokens = (*tokens)->next;
 		}
 		else if (is_redir((*tokens)->type))
@@ -129,21 +110,21 @@ t_ast	*parse_command(t_token **tokens)
 
 t_ast	*parse(t_token **tokens)
 {
-	t_ast *left;
+	t_ast	*left;
 	t_ast	*pipe;
 
 	left = parse_command(tokens);
 	if (*tokens && (*tokens)->type == TOKEN_PIPE)
 	{
 		*tokens = (*tokens)->next;
-		pipe = new_ASTNode(NODE_PIPE, NULL, NULL, TOKEN_NONE);
+		pipe = new_node(NODE_PIPE, NULL, NULL, TOKEN_NONE);
 		if (!pipe)
-			return (ft_freeAST(left), NULL);
+			return (ft_free_ast(left), NULL);
 		pipe->left = left;
 		pipe->right = parse(tokens);
 		if (!pipe->right)
 		{
-			ft_freeAST(pipe);
+			ft_free_ast(pipe);
 			return (NULL);
 		}
 		return (pipe);

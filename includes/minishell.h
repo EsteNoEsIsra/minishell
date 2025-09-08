@@ -6,7 +6,7 @@
 /*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 15:34:52 by nalesso           #+#    #+#             */
-/*   Updated: 2025/08/26 16:37:06 by nalesso          ###   ########.fr       */
+/*   Updated: 2025/09/08 20:45:04 by nalesso          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,22 +81,41 @@ typedef struct s_mini_sh
 	t_ast	*node_head;
 }	t_mini_sh;
 
+typedef struct s_tokctx
+{
+	int			i;
+	t_token		*head;
+	t_token		*last;
+}	t_tokctx;
+
 void	ft_getinput(t_mini_sh *sh);
+
+t_token	*new_token(t_token_type type, char *value);
+int		check_quotes(char *line);
+char	*ft_build_word(char *line, int *i, t_mini_sh *sh);
+void	expand_last_status(char **word, int *i, t_mini_sh *sh);
+void	handle_env(char *line, int *i, char **word, t_mini_sh *sh);
+void	handle_quotes(char *line, int *i, char **word, t_mini_sh *sh);
 t_token	*tokenizer(char	*line, t_mini_sh *sh);
+
 t_ast	*parse(t_token **tokens);
+int		validate_command(t_ast *node);
+int		is_redir(t_token_type type);
 t_ast	*apply_redirs_and_get_cmd(t_ast *node);
 void	expand_heredocs(t_ast *node);
+
+char	*ft_get_path(t_ast *command, t_mini_sh *sh);
+int		preflight_path(char *path);
+void	child_heredoc(int *fd, char *delimiter);
 void	ft_execute(t_ast *node, t_mini_sh *sh);
 
-void	ft_freeAST(t_ast *head);
+void	ft_free_ast(t_ast *head);
 void	ft_free_tokens(t_token *tokens);
 void	ft_free_env(t_env *head);
 void	ft_free_strs(char **strs);
 void	ft_free_mini_sh(t_mini_sh *sh, int env);
 
 void	ft_put_error(char *prefix, char *msg);
-
-void	print_ast(t_ast *node, int level);
 
 void	ft_execute_pipe(t_ast *node, t_mini_sh *sh);
 
@@ -126,7 +145,7 @@ void	ft_setup_own();*/
 void	ignore_sigquit(void);
 void	set_signals_interactive(void);
 void	set_signals_noninteractive(void);
-void    ft_disable_ctrl_backslash(void);
+void	ft_disable_ctrl_backslash(void);
 void	signal_sigint(int signal);
 
 # define NRM "\001\x1B[0m\002"

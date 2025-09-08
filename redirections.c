@@ -1,25 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nalesso <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/08 19:00:54 by nalesso           #+#    #+#             */
+/*   Updated: 2025/09/08 19:03:34 by nalesso          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "includes/minishell.h"
-
-void	child_heredoc(int *fd, char *delimiter)
-{
-	char *line;
-
-	close(fd[0]);
-	while (1)
-	{
-		line = readline("> ");
-		if (!ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1))
-		{
-			free(line);
-			break ;
-		}
-		write(fd[1], line, ft_strlen(line));
-		write(fd[1], "\n", 1);
-		free(line);
-	}
-	close(fd[1]);
-	exit(EXIT_SUCCESS);
-}
 
 int	ft_handle_heredoc(char *filename)
 {
@@ -79,10 +70,10 @@ int	ft_apply_redirection(t_ast *node)
 		ft_put_error(node->filename, strerror(errno));
 		return (0);
 	}
-	if (node->redir_type == TOKEN_REDIR_OUT || node->redir_type == TOKEN_REDIR_APPEND)
-		dup2(fd, STDOUT_FILENO);
-	else
+	if (node->redir_type == TOKEN_REDIR_IN || node->redir_type == TOKEN_HEREDOC)
 		dup2(fd, STDIN_FILENO);
+	else
+		dup2(fd, STDOUT_FILENO);
 	close(fd);
 	return (1);
 }
