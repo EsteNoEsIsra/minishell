@@ -97,12 +97,13 @@ void	ft_execute(t_ast *node, t_mini_sh *sh)
 		return (ft_free_mini_sh(sh, 1));
 	if (sh->mypid == 0)
 	{
-		//ft_setup_own();// poner las señales por defecto en el hijo
-		set_signals_interactive();//test----------------------------------
+		set_signals_child_exec();
 		node = child_prepare(node, sh);
 		path = resolve_path(node, sh);
 		ft_do_exec(path, node, sh);
 	}
+	set_signals_parent_during_exec();
 	waitpid(sh->mypid, &status, 0);
+	set_signals_interactive();
 	handle_status(status, sh, 0);
 }

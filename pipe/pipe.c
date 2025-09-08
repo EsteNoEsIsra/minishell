@@ -21,7 +21,11 @@ void	handle_status(int status, t_mini_sh *sh, int printed)
 			ft_put_error("Minishell: ", "Broken pipe");
 	}
 	else if (WIFSIGNALED(status))
+	{
+		if (WTERMSIG(status) == SIGINT)
+			write(1, "\n", 1);
 		sh->last_status = 128 + WTERMSIG(status);
+	}
 	else
 		sh->last_status = 1;
 }

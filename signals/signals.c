@@ -23,7 +23,7 @@ void	signal_reset_prompt(int signo)
 	if(g_signal_vol == SIGINT)
 	{
 	//if (rl_line_buffer && rl_line_buffer[0] == '\0')
-		write(1, "^C\n", 3);
+		write(1, "\n", 1);
 	//else
 	//	write(1, "\n^C\n", 4);
 	rl_on_new_line();
@@ -70,6 +70,28 @@ void	ignore_sigquit(void)
 
 	ft_memset(&act, 0, sizeof(act));
 	act.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &act, NULL);
+}
+
+/* Ignorar SIGINT/SIGQUIT en el padre durante la espera de un hijo */
+void	set_signals_parent_during_exec(void)
+{
+	struct sigaction	act;
+
+	ft_memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_IGN;
+	sigaction(SIGINT, &act, NULL);
+	sigaction(SIGQUIT, &act, NULL);
+}
+
+/* Restaurar por defecto SIGINT/SIGQUIT en el hijo antes de execve */
+void	set_signals_child_exec(void)
+{
+	struct sigaction	act;
+
+	ft_memset(&act, 0, sizeof(act));
+	act.sa_handler = SIG_DFL;
+	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGQUIT, &act, NULL);
 }
 

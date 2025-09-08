@@ -20,6 +20,7 @@
 # include <signal.h>
 # include <limits.h>
 # include <termios.h>
+# include <unistd.h>
 # include "../libft/libft.h"
 
 extern volatile sig_atomic_t	g_signal_vol;
@@ -147,6 +148,8 @@ void	set_signals_interactive(void);
 void	set_signals_noninteractive(void);
 void	ft_disable_ctrl_backslash(void);
 void	signal_sigint(int signal);
+void	set_signals_parent_during_exec(void);
+void	set_signals_child_exec(void);
 
 # define NRM "\001\x1B[0m\002"
 # define RED "\001\x1B[31m\002"
