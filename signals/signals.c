@@ -13,15 +13,14 @@
 #include "includes/minishell.h"
 #include <signal.h>
 
-volatile sig_atomic_t g_signal_vol = 0;
-
+//volatile sig_atomic_t g_signal_vol = 0;
 
 void	signal_reset_prompt(int signo)
 {
 	(void)signo;
-	g_signal_vol = SIGINT;
-	if(g_signal_vol == SIGINT)
-	{
+//	g_signal_vol = SIGINT;
+//	if(g_signal_vol == SIGINT)
+//	{
 	//if (rl_line_buffer && rl_line_buffer[0] == '\0')
 		write(1, "\n", 1);
 	//else
@@ -29,7 +28,7 @@ void	signal_reset_prompt(int signo)
 	rl_on_new_line();
 	rl_replace_line("", 0);
 	rl_redisplay();
-	}
+//	}
 }
 
 void	set_signals_interactive(void)
@@ -40,10 +39,8 @@ void	set_signals_interactive(void)
 	ft_memset(&act, 0, sizeof(act));
 	act.sa_handler = &signal_reset_prompt;
 	sigaction(SIGINT, &act, NULL);
-//	ft_disable_ctrl_backslash();
+
 }
-
-
 
 void	set_signals_noninteractive(void)
 {
@@ -53,13 +50,12 @@ void	set_signals_noninteractive(void)
 	act.sa_handler = &signal_sigint;
 	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGQUIT, &act, NULL);
-//	ft_disable_ctrl_backslash();
 }
 
 void	signal_sigint(int signal)
 {
 	(void)signal;
-	g_signal_vol = SIGINT;
+//	g_signal_vol = SIGINT;
 	rl_on_new_line();
 	printf("solo nueva linea\n");
 }
@@ -73,7 +69,7 @@ void	ignore_sigquit(void)
 	sigaction(SIGQUIT, &act, NULL);
 }
 
-/* Ignorar SIGINT/SIGQUIT en el padre durante la espera de un hijo */
+// Ignorar SIGINT/SIGQUIT en el padre durante la espera de un hijo 
 void	set_signals_parent_during_exec(void)
 {
 	struct sigaction	act;
@@ -84,7 +80,7 @@ void	set_signals_parent_during_exec(void)
 	sigaction(SIGQUIT, &act, NULL);
 }
 
-/* Restaurar por defecto SIGINT/SIGQUIT en el hijo antes de execve */
+// Restaurar por defecto SIGINT/SIGQUIT en el hijo antes de execve 
 void	set_signals_child_exec(void)
 {
 	struct sigaction	act;
@@ -199,8 +195,6 @@ void ft_setup_own(void)
 
 
 }
-
-
 void ft_setup_signals()
 {
     struct sigaction sa_int;
@@ -218,10 +212,6 @@ void ft_setup_signals()
 		sigaction(SIGQUIT, &sa_quit, NULL);  // Ctrl+ \      
 //		ft_disable_echoctl();
 //}
-
-
-
-
 */
 /*
 

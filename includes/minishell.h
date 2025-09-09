@@ -23,7 +23,7 @@
 # include <unistd.h>
 # include "../libft/libft.h"
 
-extern volatile sig_atomic_t	g_signal_vol;
+//extern volatile sig_atomic_t	g_signal_vol;
 
 typedef enum s_token_type
 {
@@ -137,11 +137,6 @@ t_env	*ft_new_env(char *name, char *value);
 t_env	*ft_setenv(char **env);
 t_env	*ft_getenv(t_env *head, char *name);
 char	**ft_env_to_arr(t_env *head);
-
-/*
-void	handle_sig_c(int sig);
-void	ft_setup_signals();
-void	ft_setup_own();*/
 
 void	ignore_sigquit(void);
 void	set_signals_interactive(void);

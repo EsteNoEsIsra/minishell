@@ -34,8 +34,7 @@ int	main(int argc, char**argv, char **envp)
 		ft_getinput(&shell);
 
 	}
-	else  // solo para saltar la funcion no usada  preguntar donde esta el heredoc para implementarlo
-		set_signals_noninteractive();
-
+	else
+		ft_put_error("Minishell", "No arguments accepted");
 	return (1);
 }
