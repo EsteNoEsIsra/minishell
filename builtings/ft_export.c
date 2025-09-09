@@ -120,22 +120,30 @@ int	ft_export_process(t_env *head, t_env *final, char *var)
 	return (0);
 }
 
-void	ft_export(t_env *head, char *var, t_mini_sh *sh)
+void	ft_export(t_env *head, char **args, t_mini_sh *sh)
 {
 	t_env	*final;
+	int		i;
+	int		ret;
 
-	if (!var)
+	if (!args || !args[1])
 	{
 		ft_put_export(head);
 		sh->last_status = 0;
 		return ;
 	}
 	final = head;
-	while (final)
-	{
-		if (final->next == NULL)
-			break ;
+	while (final && final->next)
 		final = final->next;
+	sh->last_status = 0;
+	i = 1;
+	while (args[i])
+	{
+		ret = ft_export_process(head, final, args[i]);
+		if (ret != 0)
+			sh->last_status = 1;
+		if (final && final->next)
+			final = final->next;
+		i++;
 	}
-	sh->last_status = ft_export_process(head, final, var);
 }

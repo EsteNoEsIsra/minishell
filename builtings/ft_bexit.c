@@ -71,7 +71,7 @@ void	ft_bexit(char **args, t_mini_sh *sh)
 	int	exit_status;
 
 	argc = ft_strslen(args);
-	ft_putstr_fd("exit\n", 2);
+	ft_putstr_fd("exit\n", 1);
 	if (argc >= 2)
 	{
 		if (ft_is_valid_number(args[1]) && argc == 2)

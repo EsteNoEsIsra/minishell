@@ -23,7 +23,7 @@ int	ft_execute_builting(t_ast *node, t_mini_sh *sh)
 	else if (!ft_strncmp(node->args[0], "pwd", 4))
 		return (ft_pwd(sh), 1);
 	else if (!ft_strncmp(node->args[0], "export", 7))
-		return (ft_export(sh->env, node->args[1], sh), 1);
+		return (ft_export(sh->env, node->args, sh), 1);
 	else if (!ft_strncmp(node->args[0], "unset", 6))
 		return (ft_unset(&(sh->env), node->args, sh), 1);
 	else if (!ft_strncmp(node->args[0], "env", 4))

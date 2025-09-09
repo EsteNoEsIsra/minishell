@@ -127,7 +127,7 @@ void	handle_status(int status, t_mini_sh *sh, int printed);
 void	ft_echo(char **args, t_mini_sh *sh);
 void	ft_cd(char **args, t_mini_sh *sh);
 void	ft_pwd(t_mini_sh *sh);
-void	ft_export(t_env *head, char *var, t_mini_sh *sh);
+void	ft_export(t_env *head, char **args, t_mini_sh *sh);
 void	ft_unset(t_env **head, char **vars, t_mini_sh *sh);
 void	ft_sort_env(char **env_arr);
 void	ft_env(t_env *head, char **args, t_mini_sh *sh);
