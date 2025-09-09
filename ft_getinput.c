@@ -68,9 +68,7 @@ void	ft_getinput(t_mini_sh *sh)
 	while (1)
 	{
 		set_signals_interactive();
-		sh->input = readline(GRN "Minishell$> " NRM);
-	//	if (g_signal_vol != 0)
-	//		g_signal_vol = 0;
+		sh->input = readline(GRN "Minishell$>" NRM);
 		handle_eof(sh);
 		if (skip_blank(sh))
 			continue ;

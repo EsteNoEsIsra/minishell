@@ -21,18 +21,14 @@ int	main(int argc, char**argv, char **envp)
 	{
 		shell.mypid = getpid();
 		shell.input = 0;
-		shell.myfd = 1;	
+		shell.myfd = 1;
 		shell.env = ft_setenv(envp);
 		shell.last_status = 0;
 		shell.tokens = NULL;
 		shell.tokens_head = NULL;
 		shell.node = NULL;
 		shell.node_head = NULL;
-	 	
-	//	ft_setup_signals(shell);
-	//	set_signals_interactive();
 		ft_getinput(&shell);
-
 	}
 	else
 		ft_put_error("Minishell", "No arguments accepted");

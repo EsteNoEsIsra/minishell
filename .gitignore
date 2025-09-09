@@ -1,6 +1,6 @@
 # Prerequisites
 *.d
-
+readline.supp
 # Object files
 *.o
 *.ko

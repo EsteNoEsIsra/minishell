@@ -71,24 +71,24 @@ void	ft_bexit(char **args, t_mini_sh *sh)
 	int	exit_status;
 
 	argc = ft_strslen(args);
-	if (argc > 2)
+	ft_putstr_fd("exit\n", 2);
+	if (argc >= 2)
 	{
-		ft_put_error("exit", "too many arguments");
-		sh->last_status = 1;
-		return ;
-	}
-	else if (argc == 1)
-		exit_status = sh->last_status;
-	else
-	{
-		if (ft_is_valid_number(args[1]))
+		if (ft_is_valid_number(args[1]) && argc == 2)
 			exit_status = ft_parse_exit_code(args[1]);
-		else
+		else if (!ft_is_valid_number(args[1]) && argc >= 2)
 		{
 			ft_put_error("exit", "numeric argument required");
 			exit_status = 2;
 		}
+		else
+		{
+			sh->last_status = 1;
+			return (ft_put_error("exit", "too many arguments"));
+		}
 	}
+	if (argc == 1)
+		exit_status = sh->last_status;
 	ft_free_mini_sh(sh, 1);
 	rl_clear_history();
 	exit(exit_status);
