@@ -92,7 +92,7 @@ t_token	*tokenizer(char *line, t_mini_sh *sh)
 	if (line[0] == '|')
 	{
 		ft_put_error("minishell", "syntax error near unexpected token `|'");
-		sh->last_status = 2;/////////////
+		sh->last_status = 2;
 		return (NULL);
 	}
 	checker = check_quotes(line);

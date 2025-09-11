@@ -41,7 +41,6 @@ void	set_signals_noninteractive(void)
 	sigaction(SIGQUIT, &act, NULL);
 }
 
-// Ignorar SIGINT/SIGQUIT en el padre durante la espera de un hijo 
 void	set_signals_parent_during_exec(void)
 {
 	struct sigaction	act;
@@ -52,7 +51,6 @@ void	set_signals_parent_during_exec(void)
 	sigaction(SIGQUIT, &act, NULL);
 }
 
-// Restaurar por defecto SIGINT/SIGQUIT en el hijo antes de execve 
 void	set_signals_child_exec(void)
 {
 	struct sigaction	act;

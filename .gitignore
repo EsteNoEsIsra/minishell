@@ -2,7 +2,7 @@
 *.d
 readline.supp
 .vscode/
-/test/
+/test
 # Object files
 *.o
 *.ko

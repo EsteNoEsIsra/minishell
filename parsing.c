@@ -114,6 +114,8 @@ t_ast	*parse(t_token **tokens)
 	t_ast	*pipe;
 
 	left = parse_command(tokens);
+	if (!left)
+		return (NULL);
 	if (*tokens && (*tokens)->type == TOKEN_PIPE)
 	{
 		*tokens = (*tokens)->next;

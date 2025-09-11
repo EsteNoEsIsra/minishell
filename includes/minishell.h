@@ -146,6 +146,8 @@ void	signal_sigint(int signal);
 void	set_signals_parent_during_exec(void);
 void	set_signals_child_exec(void);
 
+int		checklonglong(char *str);
+
 # define NRM "\001\x1B[0m\002"
 # define RED "\001\x1B[31m\002"
 # define GRN "\001\x1B[32m\002"

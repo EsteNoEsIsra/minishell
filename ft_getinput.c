@@ -47,7 +47,7 @@ static int	tokenize_and_parse(t_mini_sh *sh)
 	if (sh->node == NULL)
 	{
 		ft_free_mini_sh(sh, 0);
-		sh->last_status = 2;////////////
+		sh->last_status = 2;
 		return (1);
 	}
 	sh->node_head = sh->node;
