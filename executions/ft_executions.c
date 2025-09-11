@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/minishell.h"
+#include "../includes/minishell.h"
 
 static t_ast	*child_prepare(t_ast *node, t_mini_sh *sh)
 {

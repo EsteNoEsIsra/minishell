@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/minishell.h"
+#include "../includes/minishell.h"
 
 int	ft_strslen(char **strs)
 {
@@ -49,6 +49,7 @@ int	ft_parse_exit_code(char *str)
 
 	nbr = 0;
 	neg = 0;
+	
 	if (*str == '+' || *str == '-')
 	{
 		if (*str == '-')
@@ -63,6 +64,31 @@ int	ft_parse_exit_code(char *str)
 	if (neg)
 		nbr = -nbr;
 	return ((unsigned char)nbr);
+}
+
+int	checklonglong(char *str)
+{
+	int			i;
+	long long	num;
+	int			sign;
+
+	i = 0;
+	num = 0;
+	sign = 1;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		num = num * 10 + (str[i] - '0');
+		if ((num * sign) > 2147483647 || (num * sign) < -2147483648)
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 void	ft_bexit(char **args, t_mini_sh *sh)

@@ -6,7 +6,8 @@ readline.supp
 *.ko
 *.obj
 *.elf
-
+#tester
+/tester
 # Linker output
 *.ilk
 *.map
