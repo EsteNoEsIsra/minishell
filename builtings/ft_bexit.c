@@ -12,6 +12,8 @@
 
 #include "../includes/minishell.h"
 
+static int	checklonglong(char *str);
+
 int	ft_strslen(char **strs)
 {
 	int	i;
@@ -29,6 +31,8 @@ int	ft_is_valid_number(char *str)
 	i = 0;
 	if (!str || !*str)
 		return (0);
+	if (checklonglong(str) == 0)
+		return (0);
 	if (str[i] == '+' || str[i] == '-')
 		i++;
 	if (!str[i])
@@ -44,12 +48,11 @@ int	ft_is_valid_number(char *str)
 
 int	ft_parse_exit_code(char *str)
 {
-	int	nbr;
-	int	neg;
+	long long	nbr;
+	int			neg;
 
 	nbr = 0;
 	neg = 0;
-	
 	if (*str == '+' || *str == '-')
 	{
 		if (*str == '-')
@@ -65,8 +68,8 @@ int	ft_parse_exit_code(char *str)
 		nbr = -nbr;
 	return ((unsigned char)nbr);
 }
-
-int	checklonglong(char *str)
+/*
+static int	checklonglong(char *str)
 {
 	int			i;
 	long long	num;
@@ -84,12 +87,49 @@ int	checklonglong(char *str)
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		num = num * 10 + (str[i] - '0');
-		if ((num * sign) > 2147483647 || (num * sign) < -2147483648)
-			return (0);
+		i++;
+	}
+	if ((num * sign) > LLONG_MAX || (num * sign) < LLONG_MIN)
+		return (0);
+	return (1);
+}*/
+
+static int	checklonglong(char *str)
+{
+	int			i;
+	long long	num;
+	int			sign;
+
+	i = 0;
+	num = 0;
+	sign = 1;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		int digit = str[i] - '0';
+
+		if (sign == 1)
+		{
+			if (num > (LLONG_MAX - digit) / 10)
+				return (0); // overflow positivo
+		}
+		else
+		{
+			if (-num < (LLONG_MIN + digit) / 10)
+				return (0); // overflow negativo
+		}
+
+		num = num * 10 + digit;
 		i++;
 	}
 	return (1);
 }
+
 
 void	ft_bexit(char **args, t_mini_sh *sh)
 {

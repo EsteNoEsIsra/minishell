@@ -39,7 +39,7 @@ t_ast	*parse_redir(t_token **tokens, t_ast *left)
 	*tokens = (*tokens)->next;
 	if (!*tokens || (*tokens)->type != TOKEN_WORD)
 	{
-		printf("minishell: syntax error near redirection\n");
+		ft_put_error("minishell", "syntax error near redirection");
 		ft_free_ast(left);
 		return (NULL);
 	}

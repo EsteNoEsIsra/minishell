@@ -91,7 +91,8 @@ t_token	*tokenizer(char *line, t_mini_sh *sh)
 	c.last = NULL;
 	if (line[0] == '|')
 	{
-		printf("minishell: syntax error near unexpected token '|'\n");
+		ft_put_error("minishell", "syntax error near unexpected token `|'");
+		sh->last_status = 2;/////////////
 		return (NULL);
 	}
 	checker = check_quotes(line);

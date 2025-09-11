@@ -1,6 +1,8 @@
 # Prerequisites
 *.d
 readline.supp
+.vscode/
+/test/
 # Object files
 *.o
 *.ko
