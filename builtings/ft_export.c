@@ -90,6 +90,7 @@ int	ft_parse_assignment(char *var, char **key, char **value)
 	if (!*value)
 	{
 		free(*key);
+		free(value);
 		*key = NULL;
 		return (1);
 	}

@@ -22,17 +22,6 @@ static void	handle_eof(t_mini_sh *sh)
 	exit(EXIT_SUCCESS);
 }
 
-static int	skip_blank(t_mini_sh *sh)
-{
-	if (sh->input[0] == '\0' || sh->input[0] == ' ')
-	{
-		free(sh->input);
-		ft_printf("");
-		return (1);
-	}
-	return (0);
-}
-
 static int	tokenize_and_parse(t_mini_sh *sh)
 {
 	add_history(sh->input);
@@ -71,8 +60,6 @@ void	ft_getinput(t_mini_sh *sh)
 		set_signals_interactive();
 		sh->input = readline(GRN "Minishell$>" NRM);
 		handle_eof(sh);
-		if (skip_blank(sh))
-			continue ;
 		if (tokenize_and_parse(sh))
 			continue ;
 		exec_and_cleanup(sh);
